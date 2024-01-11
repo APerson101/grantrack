@@ -20,7 +20,7 @@
 	import Profilesummary from './components/Profilesummary.svelte';
 
 	// let profilesQuery: OperationResultStore;
-	const first = 10;
+	const first = 40;
 	const offset = 0;
 	const client = getContextClient();
 	let statusSelection: string = 'null';
