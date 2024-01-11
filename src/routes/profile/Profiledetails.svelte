@@ -24,17 +24,19 @@
 	const allRecipientsID: string[] = [];
 	for (let index = 0; index < $profileInfo!.amount.pools.length; index++) {
 		const pool = $profileInfo!.amount.pools[index];
+		console.log(pool);
 		allPools.push(...pool.recepients);
 		allRecipientsID.push(...pool.recepients.map((e) => e.receiver));
 	}
 	let uniqueRecipients: string[] = [...new Set(allRecipientsID)];
-
+	console.log(uniqueRecipients);
 	//get categorisezd receipeint info
 	for (let index = 0; index < uniqueRecipients.length; index++) {
 		const element = uniqueRecipients[index];
 		const ss = allPools.filter((e) => e.receiver == element);
 		allRecepientsProjects.set(element, ss);
 	}
+	console.log(allRecepientsProjects);
 </script>
 
 <div class="m-3 mr-3 flex rounded-lg bg-[#1B3A4B] p-3 sm:flex">

@@ -8,9 +8,9 @@
 	import { toast } from 'svelte-sonner';
 
 	let textToSearch: string;
-	const client = getContextClient();
 
 	async function isSearching() {
+		const client = getContextClient();
 		toast(`searching for ${textToSearch}`);
 		// find the related thing and take the user to the page
 

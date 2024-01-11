@@ -5,26 +5,27 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import {
 		CHAINSCONSTANT,
-		fakeData,
 		fetchEndedGrants,
+		fetchProfileFromAllChains,
 		fetchUpComingGrants,
 		fetchactiveGrants,
 		filterResults,
 		getChainColor,
 		getChainMapping
 	} from '$lib/datawrangler';
+	import { getProfilesPaginated } from '$lib/helper';
 	import { loadedProfiles } from '$lib/stores';
-	import type { ProfileType } from '$lib/utils';
+	import type { IProfile, ProfileType } from '$lib/utils';
 	import { getContextClient } from '@urql/svelte';
 	import Profilesummary from './components/Profilesummary.svelte';
 
 	// let profilesQuery: OperationResultStore;
-	const first = 1;
-	const offset = 1;
+	const first = 10;
+	const offset = 0;
 	const client = getContextClient();
 	let statusSelection: string = 'null';
 	let chainSelection: string = 'null';
-	let currentDisplay: number = 0;
+	let currentDisplay: string = '0';
 	// $: profilesQuery = queryStore({
 	// 	client: getContextClient(),
 	// 	query: getProfilesPaginated,
@@ -33,33 +34,33 @@
 	// 		offset
 	// 	}
 	// });
-
+	console.log(currentDisplay);
 	async function retreiver(filter?: boolean) {
-		await new Promise((rs) => setTimeout(rs, 0));
-		if (filter) {
-			return filterRes(fakeData);
-		}
-		return fakeData;
-		// var newProfilesJson = await client
-		// 	.query(getProfilesPaginated, {
-		// 		first,
-		// 		offset
-		// 	})
-		// 	.toPromise();
-		// //format and save
-		// const profilesJson = newProfilesJson.data.profiles as IProfile[];
-		// console.log('I HOPE THIS WORKS');
-		// const allProfiles: ProfileType[] = [];
-		// for (let index = 0; index < profilesJson.length; index++) {
-		// 	const element = profilesJson[index];
-		// 	console.log(`${element.profileId}`);
-		// 	console.log('preparing to fetch data....');
-		// 	const profile = await fetchProfileFromAllChains(client, element.profileId);
-		// 	console.log(profile);
-		// 	allProfiles.push(profile);
+		// return fakeData;
+		// await new Promise((rs) => setTimeout(rs, 0));
+		// if (filter == true) {
+		// 	return filterRes(fakeData);
 		// }
-		// loadedProfiles.set([...allProfiles]);
-		// return [...allProfiles];
+		var newProfilesJson = await client
+			.query(getProfilesPaginated, {
+				first,
+				offset
+			})
+			.toPromise();
+		//format and save
+		const profilesJson = newProfilesJson.data.profiles as IProfile[];
+		console.log('I HOPE THIS WORKS');
+		const allProfiles: ProfileType[] = [];
+		for (let index = 0; index < profilesJson.length; index++) {
+			const element = profilesJson[index];
+			console.log(`${element.profileId}`);
+			console.log('preparing to fetch data....');
+			const profile = await fetchProfileFromAllChains(client, element.profileId);
+			console.log(profile);
+			if (profile != null) allProfiles.push(profile);
+		}
+		loadedProfiles.set([...allProfiles]);
+		return [...allProfiles];
 	}
 	$: profilesPromise = retreiver();
 
@@ -68,7 +69,7 @@
 	}
 
 	async function getMicro() {
-		currentDisplay = 1;
+		currentDisplay = '5';
 		if (statusSelection == 'u') {
 			return await fetchUpComingGrants(client);
 		}
@@ -84,7 +85,7 @@
 	}
 
 	function filterRes(profiles: ProfileType[]) {
-		currentDisplay = 0;
+		currentDisplay = '0';
 		return filterResults(chainSelection, profiles);
 	}
 
@@ -132,13 +133,14 @@
 				{/each}
 			</RadioGroup.Root>
 		</div>
-		{#if currentDisplay == 0}
-			<div class="flex w-full flex-col space-y-4">
-				{#each profiles as profile}
-					<Profilesummary on:click={() => saveAll(profiles)} {profile} />
-				{/each}
-			</div>
-		{:else if currentDisplay == 1}
+		<!-- {#if currentDisplay != '0'} -->
+		<!-- {profiles.length} -->
+		<div class="flex w-full flex-col space-y-4">
+			{#each profiles as profile}
+				<Profilesummary on:click={() => saveAll(profiles)} {profile} />
+			{/each}
+		</div>
+		<!-- {:else if currentDisplay == '5'}
 			<div class="m-2 flex-col space-y-2 p-4">
 				{#await grants}
 					<div>loading Grants</div>
@@ -160,6 +162,6 @@
 					{/each}
 				{/await}
 			</div>
-		{/if}
+		{/if} -->
 	</div>
 {/await}
